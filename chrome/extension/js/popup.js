@@ -42,8 +42,8 @@ window.addEventListener(
     );
 
     queryForResults();
-    setInterval(queryForResults, 5000);
-  },
+    setInterval(queryForResults, 50000);
+},  
   false
 );
 
@@ -112,7 +112,7 @@ function show(totalResults) {
   document.querySelector("#stats").innerHTML = `<span>URLs scanned: ${
     results.length
   }</span> <span class="${
-    vulnerabilities.length > 0 ? "vuln" : ""
+    vulnerabilities > 0 ? "vuln" : ""
   }">Vulnerabilities found: ${vulnerabilities}</span>`;
 
   results.forEach((rs) => {
@@ -138,6 +138,8 @@ function show(totalResults) {
       y.component + y.version + y.url
     );
   });
+
+
   res.forEach((r) => {
     let tr = document.createElement("tr");
     document.getElementById("results").appendChild(tr);

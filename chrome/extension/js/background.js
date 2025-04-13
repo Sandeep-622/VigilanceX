@@ -241,7 +241,7 @@ events.on("result-ready", function (details, results) {
 
 setInterval(() => {
   chrome.runtime.sendMessage({ type: "ping" });
-}, 5000);
+}, 50000);
 
 downloadRepo().then(() => {
   chrome.runtime.sendMessage({ type: "repo-ready", repo: repo });
