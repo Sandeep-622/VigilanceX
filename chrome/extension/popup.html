@@ -8,7 +8,7 @@
     <script src="js/sample.js"></script>
     <style type="text/css">
       :root {
-        --primary-color: #4a6cfa;
+        --primary-color: #d71f1f;
         --primary-hover: #3a5bf0;
         --bg-dark: #121419;
         --card-bg-dark: #1e2028;
@@ -77,7 +77,7 @@
       .logo-icon {
         width: 28px;
         height: 28px;
-        fill: var(--primary-color);
+        fill: #d71f1f;
       }
 
       h1 {
@@ -196,6 +196,8 @@
         position: relative;
         box-shadow: var(--shadow-dark);
         border-left: 4px solid transparent;
+		overflow-x: auto; /* Enables horizontal scrolling */
+    /* word-break: break-word; */
       }
 
       .rowEntry:hover {
@@ -272,7 +274,7 @@
       }
 
       .listVulns tr.high td:first-child {
-        color: #e67e22;
+        color: #e74c3c;
         font-weight: 600;
       }
 
@@ -296,7 +298,7 @@
         text-align: center;
         margin: 0 0.25rem;
         background: rgba(74, 108, 250, 0.1);
-        border-radius: 50%;
+        border-radius: 10%;
         font-size: 0.8rem;
       }
 
@@ -431,7 +433,7 @@
       
       #results-container {
         max-height: 320px;
-        overflow-y: auto;
+        /* overflow-y: auto; */
         padding-right: 0.5rem;
       }
     </style>

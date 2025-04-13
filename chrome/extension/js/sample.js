@@ -18,7 +18,6 @@ async function callGemini(promptText) {
 
 let prompt = ""
 
-
 window.addEventListener(
   "load",
   () => {
@@ -64,7 +63,6 @@ window.addEventListener(
       const themeToggle = document.querySelector("input[type=checkbox]#themeToggle");
       themeToggle.addEventListener("click", () => {
           document.documentElement.classList.toggle("light-mode", !themeToggle.checked);
-          // Persist theme preference
           localStorage.setItem("theme", themeToggle.checked ? "dark" : "light");
       });
 
@@ -111,7 +109,6 @@ function queryForResults() {
                 .join('') +
               '</ul>';
 
-
             document.getElementById("suggestion").innerHTML = "<h3>Possible Threats</h3>" + formattedResult;
             document.getElementById('suggestion').classList.add("open")
 
@@ -130,6 +127,7 @@ function queryForResults() {
     );
   });
 }
+
 function mapSeverity(vulns) {
   if (vulns.some((v) => v.severity == "critical")) return "critical";
   if (vulns.some((v) => v.severity == "high")) return "high";
@@ -137,6 +135,7 @@ function mapSeverity(vulns) {
   if (vulns.some((v) => v.severity == "low")) return "low";
   return "high";
 }
+
 const severityMap = {
   critical: 4,
   high: 3,
@@ -144,6 +143,7 @@ const severityMap = {
   low: 1,
   unknown: 0,
 };
+
 const detMapping = {
   ast: "AST",
   uri: "URI",
@@ -187,6 +187,7 @@ function show(totalResults) {
       }, 0)
     );
   }, 0);
+  
   document.querySelector("#stats").innerHTML = `<span>URLs scanned: ${results.length
     }</span> <span class="${vulnerabilities > 0 ? "vuln" : ""
     }">Vulnerabilities found: ${vulnerabilities}</span>`;
@@ -200,9 +201,11 @@ function show(totalResults) {
       rs.results = [{ url: rs.url, unknown: true, component: "unknown" }];
     }
   });
+  
   let res = results.reduce((x, y) => {
     return x.concat(y.results);
   }, []);
+  
   res.sort((x, y) => {
     if (x.unknown != y.unknown) {
       return x.unknown ? 1 : -1;
@@ -231,7 +234,6 @@ function show(totalResults) {
       }
     });
 
-
     let vulns;
     if (r.unknown) {
       tr.classList.add("unknown");
@@ -244,7 +246,7 @@ function show(totalResults) {
       td(tr, "version").innerText = r.version;
       vulns = td(tr, "vulns");
       let d = detMapping[r.detection] ?? r.detection;
-      vulns.innerHTML = `${r.url} (${d} detection)`;
+      vulns.innerHTML = `${r.url} ${d ? `(${d} detection)` : ''}`;
     }
 
     if (r.vulnerabilities && r.vulnerabilities.length > 0) {
@@ -257,7 +259,6 @@ function show(totalResults) {
 
       listVulns = document.createElement("div");
       listVulns.className = "listVulns";
-      // listVulns.style.display = "none"; // Hide initially
       tr.appendChild(listVulns);
 
       const table = document.createElement("table");
@@ -284,7 +285,7 @@ function show(totalResults) {
             .join(" ")
           : " ";
         prompt = prompt + ids.innerHTML
-        // console.log(ids.innerHTML)
+
         // Info cell (right aligned)
         const info = td1(row);
         info.className = "info";
@@ -303,25 +304,25 @@ function show(totalResults) {
       });
     }
   });
-
 }
+
 function td(tr, cName) {
   let cell = document.createElement("span");
   cell.className = cName;
   tr.appendChild(cell);
   return cell;
 }
+
 function td1(tr) {
   let cell = document.createElement("td");
   tr.appendChild(cell);
   return cell;
 }
 
-
-
 Object.prototype.forEachOwnProperty = function (f) {
   mapOwnProperty(f);
 };
+
 Object.prototype.mapOwnProperty = function (f) {
   var results = [];
   for (var i in this) {
