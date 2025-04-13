@@ -22,48 +22,61 @@ let prompt = ""
 window.addEventListener(
   "load",
   () => {
-    sendMessage("enabled?", null, (response) => {
-      document.querySelector("input[type=checkbox]#enabled").checked =
-        response.enabled;
-    });
-    sendMessage("deepScanEnabled?", null, (response) => {
-      document.querySelector("input[type=checkbox]#deepEnabled").checked =
-        response.enabled;
-    });
+      // Existing enabled and deepEnabled handlers
+      sendMessage("enabled?", null, (response) => {
+          document.querySelector("input[type=checkbox]#enabled").checked =
+              response.enabled;
+      });
+      sendMessage("deepScanEnabled?", null, (response) => {
+          document.querySelector("input[type=checkbox]#deepEnabled").checked =
+              response.enabled;
+      });
 
-    document.querySelector("input[type=checkbox]#enabled").addEventListener(
-      "click",
-      () => {
-        chrome.action.setIcon({
-          path: this.checked ? "img/favicon_48.png" : "icons/icon_bw48.png",
-        });
-        sendMessage("enable", this.checked, null);
-      },
-      false
-    );
-    document.querySelector("input[type=checkbox]#deepEnabled").addEventListener(
-      "click",
-      () => {
-        sendMessage("deepScanEnable", this.checked, null);
-      },
-      false
-    );
+      document.querySelector("input[type=checkbox]#enabled").addEventListener(
+          "click",
+          () => {
+              chrome.action.setIcon({
+                  path: this.checked ? "img/favicon_48.png" : "icons/icon_bw48.png",
+              });
+              sendMessage("enable", this.checked, null);
+          },
+          false
+      );
 
-    document.querySelector("input[type=checkbox]#unknown").addEventListener(
-      "click",
-      () => {
-        const r = document.getElementById("results");
-        if (r.className.includes("hideunknown")) {
-          r.className = r.className.replace("hideunknown", "");
-        } else {
-          r.className += " hideunknown";
-        }
-      },
-      false
-    );
+      document.querySelector("input[type=checkbox]#deepEnabled").addEventListener(
+          "click",
+          () => {
+              sendMessage("deepScanEnable", this.checked, null);
+          },
+          false
+      );
 
-    queryForResults();
-    setInterval(queryForResults, 50000);
+      // Unknown toggle handler
+      const resultsContainer = document.getElementById("results");
+      const unknownToggle = document.querySelector("input[type=checkbox]#unknown");
+      
+      unknownToggle.addEventListener("click", () => {
+          resultsContainer.classList.toggle("show-unknown", unknownToggle.checked);
+          resultsContainer.classList.toggle("hide-unknown", !unknownToggle.checked);
+      });
+
+      // Theme toggle handler
+      const themeToggle = document.querySelector("input[type=checkbox]#themeToggle");
+      themeToggle.addEventListener("click", () => {
+          document.documentElement.classList.toggle("light-mode", !themeToggle.checked);
+          // Persist theme preference
+          localStorage.setItem("theme", themeToggle.checked ? "dark" : "light");
+      });
+
+      // Load saved theme preference
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+          themeToggle.checked = false;
+          document.documentElement.classList.add("light-mode");
+      }
+
+      queryForResults();
+      setInterval(queryForResults, 50000);
   },
   false
 );
@@ -143,6 +156,12 @@ function show(totalResults) {
 
   document.getElementById("results").innerHTML = "";
   document.getElementById("suggestion").innerHTML = "";
+  
+  // Maintain existing class for unknown toggle
+  const resultsContainer = document.getElementById("results");
+  const isUnknownShown = document.querySelector("#unknown").checked;
+  resultsContainer.classList.toggle("show-unknown", isUnknownShown);
+  resultsContainer.classList.toggle("hide-unknown", !isUnknownShown);
   console.log(totalResults);
   var merged = {};
   totalResults.forEach((rs) => {
