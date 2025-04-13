@@ -1,5 +1,5 @@
 async function callGemini(promptText) {
-  const apiKey = 'AIzaSyB4aeSXleQjEjH2xZynnSyvH3ma0tn8NzE';
+  const apiKey = 'YOUR_GEMINI_KEY';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
   const payload = {
