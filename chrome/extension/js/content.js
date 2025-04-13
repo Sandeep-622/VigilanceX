@@ -1,10 +1,29 @@
 /* global chrome, console */
 
 let count = 0;
-
 const totalResults = [];
 
 (function () {
+  // Check HTTPS status when page loads
+  const isSecure = window.location.protocol === 'https:';
+  const httpsResult = {
+    url: window.location.href,
+    results: [{
+      component: "Protocol Security",
+      version: isSecure ? "HTTPS" : "HTTP",
+      vulnerabilities: !isSecure ? [{
+        severity: "high",
+        identifiers: {
+          summary: "Insecure HTTP Protocol Detected"
+        },
+        info: ["Connection is not secure. Data transmitted over HTTP is vulnerable to interception."],
+        below: "2.0.0"
+      }] : undefined
+    }]
+  };
+
+  totalResults.push(httpsResult);
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message) {
       const result = JSON.parse(request.message);
