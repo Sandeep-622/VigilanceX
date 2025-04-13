@@ -198,6 +198,43 @@
 		.vulnerable tr.low {
 			color: #90C67C;
 		}
+		
+		.loading{
+			padding: 16px 16px;
+			/* border: 1px solid rgb(207, 207, 207); */
+			border-radius: 5px;
+			/* transition:all 0.1s linear; */
+			font-size: small;
+			color: white;
+		}
+		/* .loading:hover{
+			border: 4px solid rgb(255, 255, 255);
+			cursor: pointer;
+			} */
+		.loadingBlock{
+			opacity: 0;
+			max-height:0;
+			display: flex;
+			font-size: larger;
+			font-weight: bold;
+			justify-content: space-between;
+			align-items: center;
+			transition: all 0.3s linear;
+		}
+		.loadingBlock.open{
+			max-height: 100px;
+			opacity: 1;
+		}
+
+		.suggestion{
+			max-height: 0;
+			opacity: 0;
+			transition: all 0.3s linear;
+		}
+		.suggestion.open{
+			max-height: 100px;
+			opacity: 1;
+		}
 	</style>
 </head>
 
@@ -209,8 +246,14 @@
 	</div>
 	<h1>cupNoodles</h1>
 	<header id="stats"></header>
-	<!-- <table id="results" class="hideunknown">
-	</table> -->
+	<div class="loading">
+		<div class="loadingBlock">
+			<span>AI Report Loading</span>
+			<img src="img/loading3.gif" alt="loading_gif" style="width:64px;height:64px;">
+		</div>
+		<div id="suggestion">
+		</div>
+	</div>
 	<div id="results" class="hideunknown">
 
 	</div>

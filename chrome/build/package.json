@@ -4,11 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "browserify index.js --standalone retirechrome -o ../extension/js/generated/cupNoodles.js"
+    "build": "browserify index.js --standalone retirechrome -o ../extension/js/generated/cupNoodles.js",
+    "build:gemini": "browserify gemini.js --standalone gemini -o extension/js/generated/gemini.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "browserify": "^17.0.0"
+  },
+  "dependencies": {
+    "@google/genai": "^0.8.0"
   }
 }

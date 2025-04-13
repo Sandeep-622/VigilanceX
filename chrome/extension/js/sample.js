@@ -1,3 +1,24 @@
+async function callGemini(promptText) {
+  const apiKey = 'AIzaSyB4aeSXleQjEjH2xZynnSyvH3ma0tn8NzE';
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const payload = {
+    contents: [{ parts: [{ text: promptText }] }]
+  };
+
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini";
+}
+
+let prompt = ""
+
+
 window.addEventListener(
   "load",
   () => {
@@ -52,8 +73,45 @@ function queryForResults() {
     chrome.tabs.sendMessage(
       tabs[0].id,
       { getDetected: 1 },
-      function (response) {
+      async function (response) {
+        if (!document.querySelector('.loadingBlock').classList.contains("open")) {
+          document.querySelector('.loadingBlock').classList.add("open");
+        }
+        if (!document.getElementById('suggestion').classList.contains("open")) {
+          document.getElementById('suggestion').classList.remove("open")
+        }
         show(response);
+        console.log(prompt)
+
+        // Gemini is being Called
+        if (prompt != "") {
+          setTimeout(async () => {
+            const result = await callGemini(
+              "This are the vulnerabilities that I found on a webpage. List out some of the possible data breaches that can take place due to these vulnerabilites: Only list possible breached in 5-10 bullet points of one line. Since I am using gemini api, don't any font styling, just add new line after each point" + prompt
+            );
+            document.querySelector('.loadingBlock').classList.remove('open')
+            const formattedResult = '<ul>' +
+              result
+                .split('*')
+                .filter(line => line.trim() !== '') // skip empty lines
+                .map(line => `<li>${line.trim()}</li>`) // wrap each point in <li>
+                .join('') +
+              '</ul>';
+
+
+            document.getElementById("suggestion").innerHTML = "<h3>Possible Threats</h3>" + formattedResult;
+            document.getElementById('suggestion').classList.add("open")
+
+            console.log("done gemini");
+          }, 200);
+        }
+        else {
+          document.querySelector('.loadingBlock').classList.remove('open')
+          const result = "No Vulnerabilies. Clear to go."
+          const formattedResult = result
+          document.getElementById("suggestion").innerHTML = "<h3>Possible Threats</h3> <br>" + formattedResult;
+          document.getElementById('suggestion').classList.add("open")
+        }
         console.log(response);
       }
     );
@@ -84,6 +142,7 @@ function show(totalResults) {
   if (totalResults == null || totalResults == undefined) return;
 
   document.getElementById("results").innerHTML = "";
+  document.getElementById("suggestion").innerHTML = "";
   console.log(totalResults);
   var merged = {};
   totalResults.forEach((rs) => {
@@ -109,11 +168,9 @@ function show(totalResults) {
       }, 0)
     );
   }, 0);
-  document.querySelector("#stats").innerHTML = `<span>URLs scanned: ${
-    results.length
-  }</span> <span class="${
-    vulnerabilities > 0 ? "vuln" : ""
-  }">Vulnerabilities found: ${vulnerabilities}</span>`;
+  document.querySelector("#stats").innerHTML = `<span>URLs scanned: ${results.length
+    }</span> <span class="${vulnerabilities > 0 ? "vuln" : ""
+    }">Vulnerabilities found: ${vulnerabilities}</span>`;
 
   results.forEach((rs) => {
     rs.results.forEach((r) => {
@@ -143,16 +200,10 @@ function show(totalResults) {
     let tr = document.createElement("div");
     tr.className = "rowEntry"
     document.getElementById("results").appendChild(tr);
-  
+
     // Create vulnerability section container but keep it hidden initially
     let listVulns = null;
-  
-    // tr.addEventListener("click", () => {
-    //   if (listVulns) {
-    //     listVulns.style.display =
-    //       listVulns.style.display === "none" ? "block" : "none";
-    //   }
-    // });
+
     tr.addEventListener("click", () => {
       if (listVulns.classList.contains("open")) {
         listVulns.classList.remove("open");
@@ -160,8 +211,8 @@ function show(totalResults) {
         listVulns.classList.add("open");
       }
     });
-    
-  
+
+
     let vulns;
     if (r.unknown) {
       tr.classList.add("unknown");
@@ -176,7 +227,7 @@ function show(totalResults) {
       let d = detMapping[r.detection] ?? r.detection;
       vulns.innerHTML = `${r.url} (${d} detection)`;
     }
-  
+
     if (r.vulnerabilities && r.vulnerabilities.length > 0) {
       r.vulnerabilities.sort((x, y) => {
         return severityMap[y.severity] - severityMap[x.severity];
@@ -184,36 +235,37 @@ function show(totalResults) {
       const severity = mapSeverity(r.vulnerabilities);
       tr.classList.add("vulnerable");
       tr.classList.add(severity);
-  
+
       listVulns = document.createElement("div");
       listVulns.className = "listVulns";
       // listVulns.style.display = "none"; // Hide initially
       tr.appendChild(listVulns);
-  
+
       const table = document.createElement("table");
       table.style.width = "100%";
       listVulns.appendChild(table);
-  
+
       r.vulnerabilities.forEach(function (v) {
         const row = document.createElement("tr");
         row.className = v.severity;
         table.appendChild(row);
-  
+
         // Severity cell (left aligned)
         const sev = td1(row);
         sev.style.textAlign = "left";
         sev.innerText = v.severity || " ";
-  
+
         // Identifiers cell (left aligned)
         const ids = td1(row);
         ids.style.textAlign = "left";
         ids.innerText = v.identifiers
           ? v.identifiers
-              .mapOwnProperty((val) => val)
-              .flatten()
-              .join(" ")
+            .mapOwnProperty((val) => val)
+            .flatten()
+            .join(" ")
           : " ";
-  
+        prompt = prompt + ids.innerHTML
+        // console.log(ids.innerHTML)
         // Info cell (right aligned)
         const info = td1(row);
         info.className = "info";
@@ -232,9 +284,9 @@ function show(totalResults) {
       });
     }
   });
-  
+
 }
-function td(tr,cName) {
+function td(tr, cName) {
   let cell = document.createElement("span");
   cell.className = cName;
   tr.appendChild(cell);
@@ -245,6 +297,9 @@ function td1(tr) {
   tr.appendChild(cell);
   return cell;
 }
+
+
+
 Object.prototype.forEachOwnProperty = function (f) {
   mapOwnProperty(f);
 };
