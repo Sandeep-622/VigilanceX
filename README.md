@@ -48,11 +48,11 @@ VigilanceX is a powerful Chrome extension for real-time JavaScript vulnerability
 - **Show Unknown**: Option to display unrecognized scripts
 
 ### Detection Methods
-
-- **AST Analysis**: Analyzes JavaScript abstract syntax trees
-- **URI Detection**: Matches known vulnerable CDN URLs
-- **Content Analysis**: Scans file contents for vulnerability signatures
-- **Hash Detection**: Matches file hashes against known vulnerable versions
+Detection Methods
+-AST Analysis: Analyzes JavaScript Abstract Syntax Trees (AST) to identify patterns and constructs associated with vulnerabilities, such as insecure API usage or obfuscated code.
+-URI Detection: Matches known vulnerable CDN or package URLs against a curated vulnerability database to identify externally loaded assets that may pose security risks.
+-Content Analysis: Scans the content of files for known vulnerability signatures, such as insecure code snippets, suspicious function calls, or unsafe patterns.
+-Hash Detection: Compares file hashes against a database of hashes from known vulnerable versions of libraries or scripts, allowing for fast and accurate identification.
 
 ### Vulnerability Information
 
